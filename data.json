@@ -1,0 +1,50 @@
+{
+  "siteName": "Nav",
+  "siteTagline": "个人内网导航",
+  "categories": [
+    {
+      "id": "network",
+      "name": "网络设备",
+      "color": "#3b82f6",
+      "links": [
+        { "title": "iKuai 软路由", "url": "http://172.20.0.20", "desc": "主路由 · 网关管理面板", "icon": "router", "iconColor": "#0d9488" },
+        { "title": "OpenWrt", "url": "http://172.20.0.31", "desc": "OpenWrt 路由器 · LuCI", "icon": "openwrt", "iconColor": "#3b82f6" },
+        { "title": "TP-Link", "url": "http://172.20.0.40", "desc": "TP-Link 管理面板", "icon": "wifi", "iconColor": "#2563eb" },
+        { "title": "H3C 路由器", "url": "http://192.168.123.1", "desc": "H3C 管理面板", "icon": "h3c", "iconColor": "#dc2626" }
+      ]
+    },
+    {
+      "id": "virtual",
+      "name": "虚拟化",
+      "color": "#0d9488",
+      "links": [
+        { "title": "ESXi 主机", "url": "https://172.20.0.10", "desc": "VMware ESXi 管理面板", "icon": "esxi", "iconColor": "#059669" }
+      ]
+    },
+    {
+      "id": "nas",
+      "name": "NAS 服务",
+      "color": "#d97706",
+      "links": [
+        { "title": "微联通", "url": "http://172.20.3.215:5000", "desc": "Synology DSM · 172.20.3.215", "icon": "weixin", "iconColor": "#07c160" },
+        { "title": "NAS (217)", "url": "http://172.20.3.217:5000", "desc": "Synology DSM · 172.20.3.217", "icon": "nas", "iconColor": "#d97706" }
+      ]
+    },
+    {
+      "id": "smart-home",
+      "name": "智能家居",
+      "color": "#10b981",
+      "links": [
+        { "title": "Home Assistant", "url": "http://172.20.0.100:8123", "desc": "智能家居控制中心", "icon": "homeassistant", "iconColor": "#41bdf5" }
+      ]
+    },
+    {
+      "id": "download",
+      "name": "下载工具",
+      "color": "#8b5cf6",
+      "links": [
+        { "title": "AriaNg", "url": "http://172.20.3.217:6880", "desc": "Aria2 前端管理面板 · Docker", "icon": "download", "iconColor": "#8b5cf6" }
+      ]
+    }
+  ]
+}

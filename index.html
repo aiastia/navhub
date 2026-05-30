@@ -1,0 +1,428 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Nav · 个人内网导航</title>
+<script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+<style>
+:root {
+  --bg: #f5f6f8;
+  --surface: #ffffff;
+  --fg: #1a1d24;
+  --fg-soft: #3a3f4a;
+  --muted: #6b7280;
+  --border: #e5e7eb;
+  --border-hover: #d1d5db;
+  --accent: #0d9488;
+  --accent-soft: rgba(13,148,136,0.08);
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.06);
+  --radius-sm: 10px;
+  --font-display: -apple-system, BlinkMacSystemFont, 'SF Pro Display', system-ui, sans-serif;
+  --font-body: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;
+}
+:root[data-theme="dark"] {
+  --bg: #0f1117;
+  --surface: #1a1d26;
+  --fg: #e5e7eb;
+  --fg-soft: #c9cdd5;
+  --muted: #7c8290;
+  --border: #2a2d38;
+  --border-hover: #3a3f4a;
+  --accent: #2dd4bf;
+  --accent-soft: rgba(45,212,191,0.1);
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.2);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.25);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; -webkit-font-smoothing: antialiased; }
+body {
+  font-family: var(--font-body);
+  background: var(--bg); color: var(--fg);
+  line-height: 1.6; min-height: 100vh;
+  transition: background-color 0.25s, color 0.25s;
+}
+a { color: inherit; text-decoration: none; }
+
+/* ── Header ── */
+.app-header {
+  position: sticky; top: 0; z-index: 100;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  transition: background-color 0.25s, border-color 0.25s;
+}
+.header-inner {
+  max-width: 1200px; margin: 0 auto;
+  display: flex; align-items: center; gap: 16px;
+  padding: 14px 24px;
+}
+.logo { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+.logo-mark {
+  width: 32px; height: 32px; border-radius: 10px;
+  background: linear-gradient(135deg, var(--accent), #0ea5e9);
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; font-family: var(--font-display);
+  font-weight: 700; font-size: 15px;
+}
+.logo-text { font-family: var(--font-display); font-weight: 700; font-size: 20px; }
+.logo-tag { font-size: 12px; color: var(--muted); margin-left: -4px; }
+
+.search-wrap { flex: 1; max-width: 480px; position: relative; }
+.search-icon {
+  position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+  width: 18px; height: 18px; color: var(--muted); pointer-events: none;
+}
+.search-input {
+  width: 100%; padding: 10px 14px 10px 42px;
+  border: 1px solid var(--border); border-radius: 12px;
+  background: var(--surface); font-family: var(--font-body);
+  font-size: 14px; color: var(--fg); outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.search-input::placeholder { color: var(--muted); }
+.search-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.search-clear {
+  position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+  width: 22px; height: 22px; border-radius: 50%;
+  border: none; background: var(--border); color: var(--muted);
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  font-size: 14px; line-height: 1;
+}
+.search-clear:hover { background: var(--border-hover); color: var(--fg); }
+.search-hint {
+  position: absolute; right: 36px; top: 50%; transform: translateY(-50%);
+  pointer-events: none; transition: opacity 0.2s;
+}
+.search-input:focus ~ .search-hint { opacity: 0; }
+.kbd {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 20px; height: 20px; padding: 0 5px;
+  border: 1px solid var(--border); border-radius: 4px;
+  font-size: 11px; color: var(--muted); background: var(--bg);
+}
+
+.header-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.theme-btn {
+  width: 38px; height: 38px; border-radius: 10px;
+  border: 1px solid var(--border); background: var(--surface);
+  color: var(--fg-soft); cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s;
+}
+.theme-btn:hover { border-color: var(--border-hover); background: var(--accent-soft); color: var(--accent); }
+.theme-btn svg { width: 18px; height: 18px; }
+
+/* ── Main ── */
+main { max-width: 1200px; margin: 0 auto; padding: 28px 24px 60px; }
+
+.category-section { margin-bottom: 36px; }
+.category-header { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+.category-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.category-name { font-family: var(--font-display); font-weight: 600; font-size: 18px; }
+.category-count { font-size: 13px; color: var(--muted); margin-left: auto; }
+
+.links-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+
+.link-card {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 16px; background: var(--surface);
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-sm); cursor: pointer;
+  transition: all 0.2s ease; position: relative; user-select: none;
+}
+.link-card:hover { border-color: var(--border-hover); box-shadow: var(--shadow-md); transform: translateY(-1px); }
+.link-card:active { transform: translateY(0); }
+.link-card.dragging { opacity: 0.4; }
+.link-card.drag-over { border-color: var(--accent); background: var(--accent-soft); }
+
+.link-icon {
+  width: 36px; height: 36px; border-radius: 10px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+.link-icon svg { width: 20px; height: 20px; }
+
+.link-info { min-width: 0; flex: 1; }
+.link-title { font-weight: 600; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.link-desc { font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 1px; }
+.link-arrow { color: var(--muted); font-size: 14px; flex-shrink: 0; opacity: 0; transition: opacity 0.2s, transform 0.2s; }
+.link-card:hover .link-arrow { opacity: 1; transform: translate(2px, -2px); }
+
+.drag-handle {
+  display: flex; flex-direction: column; gap: 2px;
+  padding: 4px 2px; margin-right: -4px;
+  cursor: grab; opacity: 0; transition: opacity 0.2s; flex-shrink: 0;
+}
+.drag-handle span { display: block; width: 10px; height: 2px; background: var(--border-hover); border-radius: 1px; }
+.link-card:hover .drag-handle { opacity: 1; }
+.drag-handle:active { cursor: grabbing; }
+
+/* ── Empty ── */
+.empty-state { text-align: center; padding: 60px 24px; color: var(--muted); }
+.empty-state svg { width: 48px; height: 48px; margin-bottom: 16px; opacity: 0.3; }
+
+/* ── Footer ── */
+.app-footer {
+  max-width: 1200px; margin: 0 auto; padding: 20px 24px 32px;
+  border-top: 1px solid var(--border);
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: 13px; color: var(--muted);
+  transition: border-color 0.25s;
+}
+
+/* ── Responsive ── */
+@media (max-width: 1024px) { .links-grid { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 768px) {
+  .links-grid { grid-template-columns: repeat(2, 1fr); }
+  .header-inner { flex-wrap: wrap; }
+  .search-wrap { order: 3; max-width: 100%; flex-basis: 100%; }
+  .logo-tag { display: none; }
+}
+@media (max-width: 480px) {
+  .links-grid { grid-template-columns: 1fr; gap: 8px; }
+  .header-inner { padding: 12px 16px; gap: 10px; }
+  main { padding: 20px 16px 40px; }
+  .link-card { padding: 12px 14px; }
+  .drag-handle { display: none; }
+}
+</style>
+</head>
+<body>
+
+<div id="app">
+  <header class="app-header">
+    <div class="header-inner">
+      <div class="logo">
+        <div class="logo-mark">{{ siteName.charAt(0) }}</div>
+        <div>
+          <div class="logo-text">{{ siteName }}</div>
+          <div class="logo-tag">{{ siteTagline }}</div>
+        </div>
+      </div>
+      <div class="search-wrap">
+        <svg class="search-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <circle cx="8.5" cy="8.5" r="5.5"/><line x1="13" y1="13" x2="18" y2="18"/>
+        </svg>
+        <input
+          type="text" class="search-input"
+          placeholder="搜索链接…" v-model="searchQuery"
+          @keydown.escape="clearSearch"
+          ref="searchRef" autocomplete="off"
+        >
+        <div class="search-hint"><span class="kbd">&#8984;K</span></div>
+        <button class="search-clear" v-if="searchQuery" @click="clearSearch" type="button">&times;</button>
+      </div>
+      <div class="header-actions">
+        <button class="theme-btn" @click="toggleTheme" type="button" title="切换亮色/暗色">
+          <svg v-if="!isDark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+          </svg>
+          <svg v-else viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section v-for="cat in filteredCategories" :key="cat.id" class="category-section">
+      <div class="category-header">
+        <div class="category-dot" :style="{ background: cat.color }"></div>
+        <h2 class="category-name">{{ cat.name }}</h2>
+        <span class="category-count">{{ cat.links.length }} 个链接</span>
+      </div>
+      <div class="links-grid">
+        <a
+          v-for="(link, idx) in cat.links" :key="link.title"
+          :href="link.url" class="link-card"
+          :class="{
+            dragging: drag.dragging === cat.id + '-' + idx,
+            'drag-over': drag.over === cat.id + '-' + idx
+          }"
+          target="_blank" rel="noopener" draggable="true"
+          @dragstart="onDragStart($event, cat.id, idx)"
+          @dragover.prevent="onDragOver(cat.id, idx)"
+          @dragleave="drag.over = null"
+          @drop.prevent="onDrop(cat.id, idx)"
+          @dragend="onDragEnd"
+        >
+          <div class="drag-handle"><span></span><span></span><span></span></div>
+          <div class="link-icon" :style="{ background: link.iconColor + '15', color: link.iconColor }" v-html="icons[link.icon] || icons.router"></div>
+          <div class="link-info">
+            <div class="link-title">{{ link.title }}</div>
+            <div class="link-desc">{{ link.desc }}</div>
+          </div>
+          <span class="link-arrow">↗</span>
+        </a>
+      </div>
+    </section>
+
+    <div v-if="searchQuery && filteredCategories.length === 0" class="empty-state">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+      <div>没有找到匹配的链接</div>
+      <div style="font-size:13px;margin-top:6px;opacity:.7">试试其他关键词</div>
+    </div>
+  </main>
+
+  <footer class="app-footer">
+    <span>{{ siteName }} · {{ siteTagline }}</span>
+    <span>拖拽排序 · ⌘K 搜索</span>
+  </footer>
+</div>
+
+<script>
+/* ── SVG 图标库 ── */
+const ICONS = {
+  router: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="13" width="20" height="7" rx="2"/><circle cx="7" cy="16.5" r="1" fill="currentColor"/><line x1="12" y1="13" x2="12" y2="8"/><path d="M8 8l4-4 4 4"/></svg>',
+  openwrt: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v4m0 12v4M2 12h4m12 0h4"/><path d="M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83m0-14.14l-2.83 2.83m-8.48 8.48l-2.83 2.83"/></svg>',
+  wifi: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><circle cx="12" cy="20" r="1" fill="currentColor"/></svg>',
+  esxi: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><rect x="7" y="7" width="4" height="4" rx="1"/><rect x="13" y="7" width="4" height="4" rx="1"/><rect x="7" y="13" width="4" height="4" rx="1"/><rect x="13" y="13" width="4" height="4" rx="1"/></svg>',
+  nas: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><line x1="6" y1="8" x2="6" y2="8.01"/><line x1="6" y1="12" x2="6" y2="12.01"/><line x1="6" y1="16" x2="6" y2="16.01"/><line x1="10" y1="8" x2="18" y2="8"/><line x1="10" y1="12" x2="18" y2="12"/><line x1="10" y1="16" x2="18" y2="16"/></svg>',
+  weixin: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 10a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1Zm5 0a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1Z"/><path d="M11 4C6.58 4 3 6.69 3 10c0 1.76 1.02 3.35 2.63 4.47L5 17l2.5-1.18A10.3 10.3 0 0 0 11 16h.5"/><path d="M16.5 11c3.04 0 5.5 2.02 5.5 4.5 0 1.24-.66 2.36-1.71 3.16L21 21l-2.13-.87A7.4 7.4 0 0 1 16.5 20.5c-3.04 0-5.5-2.02-5.5-4.5s2.46-4.5 5.5-4.5Z"/></svg>',
+  download: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>',
+  h3c: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="6" cy="12" r="1.5" fill="currentColor"/><line x1="10" y1="9" x2="10" y2="15"/><line x1="14" y1="9" x2="14" y2="15"/><path d="M18 9v6"/><path d="M15 12h6"/></svg>',
+  homeassistant: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/><circle cx="12" cy="8" r="1.5" fill="currentColor"/></svg>'
+}
+
+const { createApp, ref, computed, reactive, onMounted, onUnmounted } = Vue
+
+createApp({
+  setup() {
+    const siteName = ref('Nav')
+    const siteTagline = ref('个人内网导航')
+    const categories = ref([])
+    const searchQuery = ref('')
+    const searchRef = ref(null)
+    const isDark = ref(false)
+    const drag = reactive({ dragging: null, over: null })
+
+    /* 从 data.json 加载 */
+    async function loadData() {
+      try {
+        const res = await fetch('data.json')
+        const data = await res.json()
+        siteName.value = data.siteName
+        siteTagline.value = data.siteTagline
+        const saved = JSON.parse(localStorage.getItem('nav-order') || '{}')
+        categories.value = data.categories.map(cat => {
+          const order = saved[cat.id]
+          if (!order) return cat
+          const map = {}
+          cat.links.forEach(l => { map[l.title] = l })
+          const ordered = []
+          order.forEach(t => { if (map[t]) { ordered.push(map[t]); delete map[t] } })
+          Object.values(map).forEach(l => ordered.push(l))
+          return { ...cat, links: ordered }
+        })
+      } catch (e) {
+        console.error('加载数据失败:', e)
+      }
+    }
+
+    /* 搜索 */
+    const filteredCategories = computed(() => {
+      const q = searchQuery.value.trim().toLowerCase()
+      if (!q) return categories.value
+      return categories.value
+        .map(cat => ({
+          ...cat,
+          links: cat.links.filter(l =>
+            l.title.toLowerCase().includes(q) ||
+            l.desc.toLowerCase().includes(q) ||
+            l.url.toLowerCase().includes(q)
+          )
+        }))
+        .filter(cat => cat.links.length > 0)
+    })
+
+    /* 主题 */
+    function toggleTheme() {
+      isDark.value = !isDark.value
+      document.documentElement.setAttribute('data-theme', isDark.value ? 'dark' : '')
+      localStorage.setItem('nav-theme', isDark.value ? 'dark' : 'light')
+    }
+
+    function initTheme() {
+      const saved = localStorage.getItem('nav-theme')
+      if (saved === 'dark') isDark.value = true
+      else if (saved === 'light') isDark.value = false
+      else isDark.value = window.matchMedia('(prefers-color-scheme: dark)').matches
+      if (isDark.value) document.documentElement.setAttribute('data-theme', 'dark')
+    }
+
+    function clearSearch() {
+      searchQuery.value = ''
+      searchRef.value?.blur()
+    }
+
+    function onKeydown(e) {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault()
+        searchRef.value?.focus()
+      }
+    }
+
+    /* 拖拽 */
+    function onDragStart(e, catId, idx) {
+      drag.dragging = catId + '-' + idx
+      e.dataTransfer.effectAllowed = 'move'
+    }
+
+    function onDragOver(catId, idx) {
+      const key = catId + '-' + idx
+      if (key === drag.dragging) return
+      drag.over = key
+    }
+
+    function onDrop(targetCatId, targetIdx) {
+      if (!drag.dragging) return
+      const [srcCatId, srcIdx] = drag.dragging.split('-')
+      drag.over = null
+      if (srcCatId !== targetCatId) return
+      const cat = categories.value.find(c => c.id === srcCatId)
+      if (!cat) return
+      const links = [...cat.links]
+      const [moved] = links.splice(Number(srcIdx), 1)
+      links.splice(Number(targetIdx), 0, moved)
+      cat.links = links
+      saveOrder()
+    }
+
+    function onDragEnd() {
+      drag.dragging = null
+      drag.over = null
+    }
+
+    function saveOrder() {
+      const order = {}
+      categories.value.forEach(cat => {
+        order[cat.id] = cat.links.map(l => l.title)
+      })
+      localStorage.setItem('nav-order', JSON.stringify(order))
+    }
+
+    onMounted(() => {
+      initTheme()
+      loadData()
+      document.addEventListener('keydown', onKeydown)
+    })
+
+    onUnmounted(() => {
+      document.removeEventListener('keydown', onKeydown)
+    })
+
+    return {
+      siteName, siteTagline, searchQuery, searchRef,
+      isDark, filteredCategories, drag, icons: ICONS,
+      toggleTheme, clearSearch,
+      onDragStart, onDragOver, onDrop, onDragEnd
+    }
+  }
+}).mount('#app')
+</script>
+</body>
+</html>
