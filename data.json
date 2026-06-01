@@ -27,7 +27,7 @@
       "color": "#d97706",
       "links": [
         { "title": "微联通", "url": "http://172.20.3.215:5000", "desc": "Synology DSM · 172.20.3.215", "icon": "weixin", "iconColor": "#07c160" },
-        { "title": "NAS (217)", "url": "http://172.20.3.217:5000", "desc": "Synology DSM · 172.20.3.217", "icon": "nas", "iconColor": "#d97706" }
+        { "title": "群晖", "url": "http://172.20.3.217:5000", "desc": "Synology DSM · 172.20.3.217", "icon": "nas", "iconColor": "#d97706" }
       ]
     },
     {
